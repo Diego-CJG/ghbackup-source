@@ -1,0 +1,87 @@
+# ─── Build artifacts (PyInstaller) ───────────────────────────────────────────
+build/
+dist/
+*.spec.bak
+*.exe
+
+# ─── Entornos virtuales ───────────────────────────────────────────────────────
+.build_venv/
+.venv/
+venv/
+env/
+
+# ─── Python bytecode y cache ─────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# ─── Empaquetado y distribución ──────────────────────────────────────────────
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+wheels/
+
+# ─── Testing y cobertura ─────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.tox/
+.nox/
+
+# ─── Mypy y type checkers ────────────────────────────────────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+
+# ─── Ruff ────────────────────────────────────────────────────────────────────
+.ruff_cache/
+
+# ─── IDE y editores ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# ─── Sistema operativo ───────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+Thumbs.db
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ─── Logs y bases de datos locales ───────────────────────────────────────────
+*.log
+*.jsonl
+*.sqlite
+*.sqlite3
+*.db
+
+# ─── Secretos y configuración local ──────────────────────────────────────────
+.env
+.env.*
+vault.enc
+config.json
+*.key
+*.pem
+*.p12
