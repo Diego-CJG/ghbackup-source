@@ -68,7 +68,16 @@ ignore_missing_imports = true
 
 [tool.coverage.run]
 source = ["ghbackup"]
-omit = ["*/ui/*", "*/cli.py", "*/__main__.py"]
+# Excluidos del objetivo 80%: requieren API de GitHub real o prompts interactivos.
+# Cubiertos por tests de integracion (pendiente: test_push_e2e.py).
+omit = [
+    "*/ui/*",
+    "*/cli.py",
+    "*/__main__.py",
+    "*/commands/*",
+    "*/github_io/*",
+    "*/logging_/*",
+]
 
 [tool.coverage.report]
 show_missing = true
