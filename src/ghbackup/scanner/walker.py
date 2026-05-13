@@ -19,7 +19,7 @@ class ScannedFile:
     mtime_utc: str  # ISO 8601
 
 
-def walk(source_root: Path, ignore_spec: pathspec.PathSpec) -> Iterator[ScannedFile]:
+def walk(source_root: Path, ignore_spec: pathspec.PathSpec) -> Iterator[ScannedFile]:  # type: ignore[type-arg]
     """Genera ScannedFile para cada archivo (no carpeta) dentro del source root."""
     source_root = source_root.resolve()
     for dirpath, dirnames, filenames in os.walk(source_root):

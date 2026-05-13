@@ -32,7 +32,7 @@ def test_connection(token: str) -> ConnectionInfo:
     """Valida el token llamando a GET /user. Devuelve info de la cuenta."""
     try:
         gh = make_client(token)
-        user: AuthenticatedUser = gh.get_user()
+        user: AuthenticatedUser = gh.get_user()  # type: ignore[assignment]
         return ConnectionInfo(
             login=user.login,
             name=user.name or "",
@@ -50,7 +50,7 @@ def list_writable_repos(token: str) -> list[Repository]:
     gh = make_client(token)
     user = gh.get_user()
     repos: list[Repository] = []
-    for r in user.get_repos(affiliation="owner,collaborator,organization_member"):
+    for r in user.get_repos(affiliation="owner,collaborator,organization_member"):  # type: ignore[call-arg]
         try:
             perm = r.permissions
             if perm and (perm.push or perm.admin):
@@ -73,7 +73,7 @@ def create_private_repo(token: str, name: str, description: str = "") -> Reposit
     gh = make_client(token)
     user = gh.get_user()
     try:
-        return user.create_repo(
+        return user.create_repo(  # type: ignore[union-attr]
             name=name,
             description=description or "Repositorio de respaldo automático (ghbackup)",
             private=True,

@@ -69,7 +69,6 @@ def verify(rebuild: bool) -> None:
         return
 
     remote_files = set(gh_pull.list_files_in_commit(repo, head_sha))
-    {p.rel_path for p in []}  # placeholder
     # Compose del estado local a partir del cache actualizado tras compute_delta
     all_local = set(cache_store.get_all().keys()) | {
         c.rel_path for c in report.new + report.modified + report.renamed

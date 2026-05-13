@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import click
+from github.Repository import Repository
 
 from ghbackup.auth import vault
 from ghbackup.github_io import client as gh_client
@@ -61,7 +62,7 @@ def restore(
 
 
 def _restore_by_file(
-    repo, branch: str, source_root: Path, rel_path: str, out_path: str | None
+    repo: Repository, branch: str, source_root: Path, rel_path: str, out_path: str | None
 ) -> None:
     info(f"Buscando versiones de: {rel_path}")
     try:
@@ -108,7 +109,7 @@ def _restore_by_file(
     )
 
 
-def _restore_by_tag(repo, source_root: Path, tag_name: str) -> None:
+def _restore_by_tag(repo: Repository, source_root: Path, tag_name: str) -> None:
     info(f"Buscando tag: {tag_name}")
     try:
         ref = repo.get_git_ref(f"tags/{tag_name}")
@@ -166,7 +167,7 @@ def _restore_by_tag(repo, source_root: Path, tag_name: str) -> None:
     )
 
 
-def _restore_by_date(repo, branch: str, source_root: Path, date_str: str) -> None:
+def _restore_by_date(repo: Repository, branch: str, source_root: Path, date_str: str) -> None:
     info(f"Buscando el último commit en '{branch}' anterior a {date_str}...")
     try:
         commit_sha = gh_pull.find_commit_by_date(repo, branch, date_str)
