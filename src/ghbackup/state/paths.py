@@ -49,6 +49,9 @@ def operations_md_path() -> Path:
     return logs_dir() / "operations.md"
 
 
+def recovery_codes_path() -> Path:
+    return app_dir() / "recovery_codes.json"
+
 def ensure_dirs() -> None:
     """Crea el árbol de directorios si no existe."""
     app_dir().mkdir(parents=True, exist_ok=True)

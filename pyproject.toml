@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ghbackup"
-version = "0.1.0"
+version = "0.2.0"
 description = "Ejecutable interactivo para respaldo diferencial de carpetas locales a GitHub"
 readme = "README.md"
 requires-python = ">=3.11"

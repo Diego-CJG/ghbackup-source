@@ -18,6 +18,7 @@ from pathlib import Path
 import click
 
 from ghbackup.auth import vault
+from ghbackup.auth import recovery
 from ghbackup.github_io import client as gh_client
 from ghbackup.logging_.dual_logger import log_event
 from ghbackup.state import config as cfg_store
@@ -219,8 +220,25 @@ def setup() -> None:
     except Exception as exc:  # noqa: BLE001
         warn(f"Advertencia: no se pudo asegurar el branch ahora: {exc}")
 
+    # Generar recovery codes
+    codes = recovery.generate_codes()
+    recovery.save_codes(codes)
+
+    success("\n✅ Setup completo.")
+    warn("\n" + "=" * 60)
+    warn("  RECOVERY CODES — guardá estos codigos en un lugar seguro")
+    warn("  Cada uno es de uso unico. Sirven si olvidás la master password.")
+    warn("=" * 60)
+    for i, code in enumerate(codes, start=1):
+        info(f"  {i:2d}.  {code}")
+    warn("=" * 60)
+    warn("  Imprimelos o guardalos en tu gestor de contraseñas AHORA.")
+    warn("  No se volvera a mostrar este listado.")
+    warn("=" * 60 + "\n")
+    prompts.ask_confirm("Confirmo que guarde los recovery codes.", default=True)
+
     log_event("setup_complete", branch=branch, extra={"repo": repo.full_name, "login": conn.login})
-    success("\n✅ Setup completo. Ahora podés correr:  ghbackup push")
+    success("Ahora podés correr:  ghbackup push")
 
 
 def _slugify(name: str) -> str:
