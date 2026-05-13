@@ -1,4 +1,5 @@
 """Tests unitarios para ghbackup.auth.vault."""
+
 import pytest
 
 from ghbackup.auth import crypto

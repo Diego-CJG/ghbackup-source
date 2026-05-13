@@ -1,4 +1,5 @@
 """Tests unitarios para ghbackup.scanner.diff (compute_delta)."""
+
 import pytest
 
 from ghbackup.scanner.diff import DeltaReport, compute_delta
@@ -92,9 +93,7 @@ class TestUnchangedFiles:
         for name in ("a.txt", "b.txt", "c.txt"):
             content = name.encode()
             (tmp_path / name).write_bytes(content)
-        cache = {
-            n: _make_entry(n, n.encode()) for n in ("a.txt", "b.txt", "c.txt")
-        }
+        cache = {n: _make_entry(n, n.encode()) for n in ("a.txt", "b.txt", "c.txt")}
         monkeypatch.setattr("ghbackup.scanner.diff.get_all", lambda: cache)
         report = compute_delta(tmp_path)
         assert report.unchanged_count == 3
@@ -169,13 +168,15 @@ class TestDeltaReportHelpers:
         assert not report.has_changes()
 
     def test_has_changes_true_with_new(self):
-        from ghbackup.scanner.diff import FileChange
         from pathlib import Path
+
+        from ghbackup.scanner.diff import FileChange
+
         report = DeltaReport(new=[FileChange("f.txt", Path("f.txt"), "sha", 5, "2026Z")])
         assert report.has_changes()
 
     def test_total_upload_bytes(self, tmp_path, monkeypatch):
-        (tmp_path / "a.txt").write_bytes(b"hello")   # 5 bytes
+        (tmp_path / "a.txt").write_bytes(b"hello")  # 5 bytes
         (tmp_path / "b.txt").write_bytes(b"world!")  # 6 bytes
         report = compute_delta(tmp_path)
         assert report.total_upload_bytes() == 11

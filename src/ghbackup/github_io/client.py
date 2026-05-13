@@ -2,10 +2,10 @@
 
 Encapsula la creación del Github(), el test de conexión y la obtención de repo + branch.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
 
 from github import Auth, Github, GithubException
 from github.AuthenticatedUser import AuthenticatedUser

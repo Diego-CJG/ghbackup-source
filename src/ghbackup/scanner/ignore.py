@@ -1,10 +1,10 @@
 """Filtros de exclusión: defaults hard-coded + .backupignore opcional."""
+
 from __future__ import annotations
 
 from pathlib import Path
 
 import pathspec
-
 
 DEFAULT_PATTERNS = [
     "node_modules/",

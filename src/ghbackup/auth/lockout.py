@@ -6,14 +6,15 @@ Politica:
 - El contador se resetea en el primer intento exitoso.
 - Estado persistido en %APPDATA%\\GitHubBackup\\lockout.json.
 """
+
 from __future__ import annotations
 
+import contextlib
 import json
 import time
 from pathlib import Path
 
 from ghbackup.state.paths import app_dir
-
 
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
@@ -81,10 +82,8 @@ def record_success() -> None:
     """Resetea el contador tras un intento exitoso."""
     p = _lockout_path()
     if p.exists():
-        try:
+        with contextlib.suppress(OSError):
             p.unlink()
-        except OSError:
-            pass
 
 
 def failed_attempts() -> int:

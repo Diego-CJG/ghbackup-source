@@ -1,4 +1,5 @@
 """Tests unitarios para ghbackup.scanner.hasher."""
+
 import hashlib
 
 import pytest

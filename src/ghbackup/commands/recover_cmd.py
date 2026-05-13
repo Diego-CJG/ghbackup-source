@@ -7,13 +7,13 @@ codes generados durante el setup para hacer un reset guiado:
   3. Elimina vault.enc y lockout.json.
   4. Informa que debe correr `ghbackup setup` para reconfigurar.
 """
+
 from __future__ import annotations
 
 import click
 
-from ghbackup.auth import recovery
+from ghbackup.auth import recovery, vault
 from ghbackup.auth.lockout import record_success as lockout_reset
-from ghbackup.auth import vault
 from ghbackup.logging_.dual_logger import log_event
 from ghbackup.ui import prompts
 from ghbackup.ui.colors import error, header, info, success, warn
@@ -58,10 +58,7 @@ def recover() -> None:
         return
 
     if not recovery.validate_and_consume(code):
-        error(
-            "Codigo invalido o ya utilizado. "
-            f"Codigos restantes: {recovery.remaining_count()}"
-        )
+        error(f"Codigo invalido o ya utilizado. Codigos restantes: {recovery.remaining_count()}")
         log_event("recover_failed", result="error", extra={"reason": "invalid_code"})
         return
 
@@ -81,6 +78,8 @@ def recover() -> None:
     )
     remaining_after = recovery.remaining_count()
     if remaining_after > 0:
-        warn(f"Te quedan {remaining_after} recovery code(s) disponibles. Guardalos en un lugar seguro.")
+        warn(
+            f"Te quedan {remaining_after} recovery code(s) disponibles. Guardalos en un lugar seguro."
+        )
     else:
         warn("Usaste todos los recovery codes. Despues del setup se generaran nuevos codigos.")

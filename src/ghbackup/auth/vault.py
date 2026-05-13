@@ -7,13 +7,13 @@ Seguridad adicional:
 - Rate limiting: maximo 5 intentos fallidos -> lockout 60 segundos (via lockout.py).
 - Deteccion de vault corrupto: distingue archivo corrupto de password incorrecta.
 """
+
 from __future__ import annotations
 
 from cryptography.exceptions import InvalidTag
 
 from ghbackup.auth import crypto
 from ghbackup.auth.lockout import (
-    LockoutError,
     check_lockout,
     record_failure,
     record_success,

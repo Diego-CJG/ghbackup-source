@@ -1,4 +1,5 @@
 """Subcomando `config`: ver/editar configuración."""
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -6,8 +7,7 @@ from pathlib import Path
 
 import click
 
-from ghbackup.auth import vault
-from ghbackup.auth import recovery
+from ghbackup.auth import recovery, vault
 from ghbackup.commands.recover_cmd import recover
 from ghbackup.github_io import client as gh_client
 from ghbackup.logging_.dual_logger import log_event
@@ -59,7 +59,9 @@ def set_cmd(key: str, value: str) -> None:
         cfg.source_folder = str(p.resolve())
     elif key == "branch":
         cfg.branch = value.strip()
-    cfg.updated_at_utc = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    cfg.updated_at_utc = (
+        datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    )
     cfg_store.save(cfg)
     success(f"✅ {key} actualizado.")
     log_event("config_changed", extra={"key": key})

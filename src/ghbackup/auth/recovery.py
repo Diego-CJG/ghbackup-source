@@ -8,15 +8,14 @@ Politica:
 - Al usar un codigo: se marca como usado (no puede reutilizarse).
 - Efecto: borra vault.enc y lockout.json, guia al usuario a `ghbackup setup`.
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 import secrets
-from pathlib import Path
 
 from ghbackup.state.paths import recovery_codes_path
-
 
 CODE_COUNT = 8
 GROUP_SIZE = 5
@@ -30,8 +29,7 @@ def generate_codes() -> list[str]:
     codes = []
     for _ in range(CODE_COUNT):
         groups = [
-            "".join(secrets.choice(CHARSET) for _ in range(GROUP_SIZE))
-            for _ in range(GROUP_COUNT)
+            "".join(secrets.choice(CHARSET) for _ in range(GROUP_SIZE)) for _ in range(GROUP_COUNT)
         ]
         codes.append("-".join(groups))
     return codes

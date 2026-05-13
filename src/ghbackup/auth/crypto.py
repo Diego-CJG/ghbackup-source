@@ -6,14 +6,15 @@ Política:
 - Nonce aleatorio de 12 bytes por encriptación.
 - AES-256-GCM con tag de autenticación de 16 bytes.
 """
+
 from __future__ import annotations
 
 import os
 from dataclasses import dataclass
 
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
 
 KDF_ITERATIONS = 600_000
 KEY_SIZE_BYTES = 32  # AES-256
@@ -47,7 +48,7 @@ class EncryptedBlob:
         return self.salt + self.nonce + self.ciphertext
 
     @classmethod
-    def from_bytes(cls, blob: bytes) -> "EncryptedBlob":
+    def from_bytes(cls, blob: bytes) -> EncryptedBlob:
         if len(blob) < SALT_SIZE_BYTES + NONCE_SIZE_BYTES + 16:
             raise ValueError("blob cifrado corrupto: demasiado corto")
         salt = blob[:SALT_SIZE_BYTES]

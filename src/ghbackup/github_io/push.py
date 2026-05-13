@@ -3,22 +3,20 @@
 Si cualquier paso falla, NO se actualiza la ref del branch, por lo que el repo
 queda en su estado anterior y el cache local no se modifica.
 """
+
 from __future__ import annotations
 
 import base64
 import re
-import socket
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-import github
 from github import GithubException, InputGitTreeElement
 from github.Repository import Repository
 
 from ghbackup.github_io.client import GitHubError
-
 
 _INVALID_TAG_CHARS = re.compile(r"[\s\^~:?*\[\\]")
 
@@ -84,9 +82,9 @@ def atomic_push(
     repo: Repository,
     branch: str,
     *,
-    upserts: list[tuple[str, Path]],          # [(rel_path, abs_path), ...]
-    renames: list[tuple[str, str, Path]],     # [(old_rel, new_rel, new_abs_path), ...]
-    local_deletions: list[str],               # rel paths borrados localmente (solo se anotan, no se borran)
+    upserts: list[tuple[str, Path]],  # [(rel_path, abs_path), ...]
+    renames: list[tuple[str, str, Path]],  # [(old_rel, new_rel, new_abs_path), ...]
+    local_deletions: list[str],  # rel paths borrados localmente (solo se anotan, no se borran)
     commit_message: str,
     tag_name: str,
     tag_message: str,
@@ -110,10 +108,10 @@ def atomic_push(
                 tag_name=tag_name,
                 tag_message=tag_message,
             )
-        except (GithubException, ConnectionError, socket.timeout) as exc:
+        except (TimeoutError, GithubException, ConnectionError) as exc:
             last_exc = exc
             if attempt < max_retries:
-                time.sleep(2 ** attempt)
+                time.sleep(2**attempt)
             continue
     raise GitHubError(f"Push falló tras {max_retries} intentos: {last_exc}") from last_exc
 
@@ -132,7 +130,6 @@ def _do_push(
     # 1. Asegurar branch
     base_sha = ensure_branch(repo, branch)
     base_commit = repo.get_git_commit(base_sha)
-    base_tree_sha = base_commit.tree.sha
 
     # 2. Crear blobs
     tree_elements: list[InputGitTreeElement] = []
@@ -144,7 +141,7 @@ def _do_push(
             InputGitTreeElement(path=rel_path, mode="100644", type="blob", sha=blob_sha)
         )
 
-    for old_rel, new_rel, new_abs in renames:
+    for _old_rel, new_rel, new_abs in renames:
         blob_sha = _file_to_blob(repo, new_abs)
         bytes_uploaded += new_abs.stat().st_size
         # nuevo path con nuevo contenido

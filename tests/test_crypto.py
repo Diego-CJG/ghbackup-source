@@ -1,11 +1,12 @@
 """Tests unitarios para ghbackup.auth.crypto."""
+
 import pytest
 from cryptography.exceptions import InvalidTag
 
 from ghbackup.auth.crypto import (
-    EncryptedBlob,
     NONCE_SIZE_BYTES,
     SALT_SIZE_BYTES,
+    EncryptedBlob,
     decrypt,
     derive_key,
     encrypt,

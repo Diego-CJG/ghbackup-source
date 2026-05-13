@@ -8,15 +8,14 @@ Tabla `files`:
     last_seen_commit TEXT
     last_push_tag    TEXT
 """
+
 from __future__ import annotations
 
 import sqlite3
+from collections.abc import Iterable
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Iterable
 
 from ghbackup.state.paths import cache_path, ensure_dirs
-
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS files (

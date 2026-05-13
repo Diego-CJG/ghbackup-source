@@ -1,4 +1,5 @@
 """Subcomando `push`: detecta deltas, propone restauraciones, sube atómicamente."""
+
 from __future__ import annotations
 
 import time
@@ -19,16 +20,23 @@ from ghbackup.state.cache import CacheEntry
 from ghbackup.ui import prompts
 from ghbackup.ui.colors import dim, error, header, info, success, warn
 
-
 MAX_FILE_BYTES = 100 * 1024 * 1024  # 100 MB (límite GitHub para blobs vía API)
 
 
 @click.command("push")
 @click.option("--name", "version_name", default=None, help="Nombre custom de la versión (tag).")
-@click.option("--yes", "auto_yes", is_flag=True, help="Confirma todo automáticamente (sin prompts).")
+@click.option(
+    "--yes", "auto_yes", is_flag=True, help="Confirma todo automáticamente (sin prompts)."
+)
 @click.option("--no-prompt-name", is_flag=True, help="No pregunta nombre, usa el auto.")
-@click.option("--master-pass-env", default=None, help="Variable de entorno con la master password (uso programado).")
-def push(version_name: str | None, auto_yes: bool, no_prompt_name: bool, master_pass_env: str | None) -> None:
+@click.option(
+    "--master-pass-env",
+    default=None,
+    help="Variable de entorno con la master password (uso programado).",
+)
+def push(
+    version_name: str | None, auto_yes: bool, no_prompt_name: bool, master_pass_env: str | None
+) -> None:
     """Detecta cambios en la carpeta source y los respalda a GitHub."""
     header("ghbackup — Push")
 
@@ -63,7 +71,9 @@ def push(version_name: str | None, auto_yes: bool, no_prompt_name: bool, master_
     info(f"Repositorio destino    : {cfg.repo_full_name}  (rama: {cfg.branch})")
     info(f"Carpeta source         : {cfg.source_folder}\n")
 
-    if not auto_yes and not prompts.ask_confirm("¿Procedo a escanear la carpeta source?", default=True):
+    if not auto_yes and not prompts.ask_confirm(
+        "¿Procedo a escanear la carpeta source?", default=True
+    ):
         warn("Push cancelado.")
         return
 
@@ -86,7 +96,9 @@ def push(version_name: str | None, auto_yes: bool, no_prompt_name: bool, master_
                 oversized.append(ch)
                 bucket.remove(ch)
     if oversized:
-        warn(f"\n⚠️  {len(oversized)} archivos exceden el límite de GitHub (100 MB) y NO serán subidos:")
+        warn(
+            f"\n⚠️  {len(oversized)} archivos exceden el límite de GitHub (100 MB) y NO serán subidos:"
+        )
         for ch in oversized:
             warn(f"   - {ch.rel_path} ({ch.size_bytes // 1024 // 1024} MB)")
 
@@ -108,7 +120,7 @@ def push(version_name: str | None, auto_yes: bool, no_prompt_name: bool, master_
     local_paths = {e.path for e in cache_store.get_all().values()} | {
         c.rel_path for c in report.modified + report.new + report.renamed
     }
-    locally_missing = remote_files - local_paths
+    remote_files - local_paths
 
     # 8. Ofrecer restaurar últimos 5 borrados del último mes
     manifest = dm.load()
@@ -143,7 +155,9 @@ def push(version_name: str | None, auto_yes: bool, no_prompt_name: bool, master_
     action = "yes" if auto_yes else _confirm_or_select(report)
     if action == "no":
         warn("Push cancelado por el usuario.")
-        log_event("push", result="cancelled", branch=cfg.branch, files_summary=report.summary_dict())
+        log_event(
+            "push", result="cancelled", branch=cfg.branch, files_summary=report.summary_dict()
+        )
         return
 
     # 10. Nombre de versión (tag)
@@ -167,14 +181,12 @@ def push(version_name: str | None, auto_yes: bool, no_prompt_name: bool, master_
     local_deletions = [e.path for e in report.deleted]
 
     # 12. Confirmación final
-    if not auto_yes:
-        if not prompts.ask_confirm(
-            f"Confirmás subir {len(upserts)} archivos (+{len(renames)} renames) "
-            f"como tag '{tag_name}'?",
-            default=True,
-        ):
-            warn("Push cancelado.")
-            return
+    if not auto_yes and not prompts.ask_confirm(
+        f"Confirmás subir {len(upserts)} archivos (+{len(renames)} renames) como tag '{tag_name}'?",
+        default=True,
+    ):
+        warn("Push cancelado.")
+        return
 
     # 13. Push atómico
     commit_message = f"{tag_name} | {conn.login} | versión generada por ghbackup"
@@ -306,7 +318,11 @@ def _print_detail(report: DeltaReport) -> None:
 
 def _interactive_select(report: DeltaReport) -> None:
     """Permite al usuario deseleccionar archivos del push."""
-    all_changes = [("M", c) for c in report.modified] + [("N", c) for c in report.new] + [("R", c) for c in report.renamed]
+    all_changes = (
+        [("M", c) for c in report.modified]
+        + [("N", c) for c in report.new]
+        + [("R", c) for c in report.renamed]
+    )
     if not all_changes:
         return
     labels = [f"[{kind}] {c.rel_path}" for kind, c in all_changes]
@@ -316,7 +332,7 @@ def _interactive_select(report: DeltaReport) -> None:
     )
     selected_set = set(selected)
     new_mod, new_new, new_ren = [], [], []
-    for (kind, c), label in zip(all_changes, labels):
+    for (kind, c), label in zip(all_changes, labels, strict=False):
         if label in selected_set:
             if kind == "M":
                 new_mod.append(c)

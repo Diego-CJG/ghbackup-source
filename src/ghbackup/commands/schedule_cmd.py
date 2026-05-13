@@ -8,19 +8,18 @@ Importante:
       b) Modo "headless con Credential Manager": fuera de scope de esta versión
          inicial; se documenta como futura mejora.
 """
+
 from __future__ import annotations
 
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 
 import click
 
 from ghbackup.logging_.dual_logger import log_event
 from ghbackup.ui import prompts
 from ghbackup.ui.colors import dim, error, header, info, success, warn
-
 
 TASK_NAME = "ghbackup_auto_push"
 
@@ -30,7 +29,7 @@ def _exe_path() -> str:
     if getattr(sys, "frozen", False):
         return sys.executable
     # Fallback dev: python -m ghbackup
-    return f"\"{sys.executable}\" -m ghbackup"
+    return f'"{sys.executable}" -m ghbackup'
 
 
 @click.group("schedule")
@@ -61,26 +60,43 @@ def create_schedule(every: str, at_time: str, interval: int, master_pass_env: st
     cmd: list[str]
     if every == "daily":
         cmd = [
-            "schtasks", "/Create", "/F",
-            "/TN", TASK_NAME,
-            "/SC", "DAILY",
-            "/ST", at_time,
-            "/TR", tr,
+            "schtasks",
+            "/Create",
+            "/F",
+            "/TN",
+            TASK_NAME,
+            "/SC",
+            "DAILY",
+            "/ST",
+            at_time,
+            "/TR",
+            tr,
         ]
     elif every == "hours":
         cmd = [
-            "schtasks", "/Create", "/F",
-            "/TN", TASK_NAME,
-            "/SC", "HOURLY",
-            "/MO", str(interval),
-            "/TR", tr,
+            "schtasks",
+            "/Create",
+            "/F",
+            "/TN",
+            TASK_NAME,
+            "/SC",
+            "HOURLY",
+            "/MO",
+            str(interval),
+            "/TR",
+            tr,
         ]
     else:  # logon
         cmd = [
-            "schtasks", "/Create", "/F",
-            "/TN", TASK_NAME,
-            "/SC", "ONLOGON",
-            "/TR", tr,
+            "schtasks",
+            "/Create",
+            "/F",
+            "/TN",
+            TASK_NAME,
+            "/SC",
+            "ONLOGON",
+            "/TR",
+            tr,
         ]
 
     info("Comando a ejecutar:\n  " + " ".join(cmd))
@@ -114,7 +130,9 @@ def list_schedule() -> None:
     try:
         res = subprocess.run(
             ["schtasks", "/Query", "/TN", TASK_NAME, "/V", "/FO", "LIST"],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         print(res.stdout)
     except subprocess.CalledProcessError:
@@ -132,7 +150,9 @@ def remove_schedule() -> None:
     try:
         subprocess.run(
             ["schtasks", "/Delete", "/TN", TASK_NAME, "/F"],
-            check=True, capture_output=True, text=True,
+            check=True,
+            capture_output=True,
+            text=True,
         )
         success("✅ Tarea eliminada.")
     except subprocess.CalledProcessError as exc:

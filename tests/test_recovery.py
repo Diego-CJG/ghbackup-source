@@ -1,10 +1,12 @@
 """Tests unitarios para ghbackup.auth.recovery."""
+
 import json
+
 import pytest
 
 from ghbackup.auth.recovery import (
-    CODE_COUNT,
     CHARSET,
+    CODE_COUNT,
     GROUP_COUNT,
     GROUP_SIZE,
     codes_exist,

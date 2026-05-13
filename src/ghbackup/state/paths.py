@@ -3,11 +3,11 @@
 En Windows usamos %APPDATA%\\GitHubBackup\\.
 En otros sistemas (por si testeamos en Mac/Linux), usamos ~/.config/GitHubBackup/.
 """
+
 from __future__ import annotations
 
 import os
 from pathlib import Path
-
 
 APP_DIR_NAME = "GitHubBackup"
 
@@ -51,6 +51,7 @@ def operations_md_path() -> Path:
 
 def recovery_codes_path() -> Path:
     return app_dir() / "recovery_codes.json"
+
 
 def ensure_dirs() -> None:
     """Crea el árbol de directorios si no existe."""

@@ -1,4 +1,5 @@
 """Definición de la CLI con click."""
+
 from __future__ import annotations
 
 import click

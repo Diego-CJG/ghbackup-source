@@ -1,21 +1,22 @@
 """Walker recursivo del source folder con filtros aplicados."""
+
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterator
 
 import pathspec
 
 
 @dataclass
 class ScannedFile:
-    rel_path: str            # ruta relativa al source root, en formato posix
+    rel_path: str  # ruta relativa al source root, en formato posix
     abs_path: Path
     size_bytes: int
-    mtime_utc: str           # ISO 8601
+    mtime_utc: str  # ISO 8601
 
 
 def walk(source_root: Path, ignore_spec: pathspec.PathSpec) -> Iterator[ScannedFile]:
@@ -25,7 +26,9 @@ def walk(source_root: Path, ignore_spec: pathspec.PathSpec) -> Iterator[ScannedF
         # filtrar subdirectorios ignorados in-place (poda)
         kept_dirs: list[str] = []
         for d in dirnames:
-            rel_dir = str(Path(dirpath, d).resolve().relative_to(source_root)).replace("\\", "/") + "/"
+            rel_dir = (
+                str(Path(dirpath, d).resolve().relative_to(source_root)).replace("\\", "/") + "/"
+            )
             if not ignore_spec.match_file(rel_dir):
                 kept_dirs.append(d)
         dirnames[:] = kept_dirs

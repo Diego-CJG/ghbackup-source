@@ -1,4 +1,5 @@
 """Subcomando `restore`: tres modos (--file, --tag, --date)."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -18,9 +19,13 @@ from ghbackup.ui.colors import dim, error, header, info, success, warn
 @click.command("restore")
 @click.option("--file", "file_path", default=None, help="Ruta relativa del archivo a restaurar.")
 @click.option("--tag", "tag_name", default=None, help="Tag (versión) a restaurar completamente.")
-@click.option("--date", "date_str", default=None, help="Fecha YYYY-MM-DD: restaura el estado a esa fecha.")
+@click.option(
+    "--date", "date_str", default=None, help="Fecha YYYY-MM-DD: restaura el estado a esa fecha."
+)
 @click.option("--out", "out_path", default=None, help="Ruta de destino (override de la original).")
-def restore(file_path: str | None, tag_name: str | None, date_str: str | None, out_path: str | None) -> None:
+def restore(
+    file_path: str | None, tag_name: str | None, date_str: str | None, out_path: str | None
+) -> None:
     """Restaura archivos desde GitHub al filesystem local."""
     header("ghbackup — Restore")
 
@@ -55,7 +60,9 @@ def restore(file_path: str | None, tag_name: str | None, date_str: str | None, o
         _restore_by_date(repo, cfg.branch, source_root, date_str)
 
 
-def _restore_by_file(repo, branch: str, source_root: Path, rel_path: str, out_path: str | None) -> None:
+def _restore_by_file(
+    repo, branch: str, source_root: Path, rel_path: str, out_path: str | None
+) -> None:
     info(f"Buscando versiones de: {rel_path}")
     try:
         versions = gh_pull.list_versions_of_file(repo, branch, rel_path)
@@ -68,7 +75,7 @@ def _restore_by_file(repo, branch: str, source_root: Path, rel_path: str, out_pa
 
     info(f"Se encontraron {len(versions)} versiones:")
     labels = [
-        f"{i+1}. {v.commit_date_utc}  {v.tag or '(sin tag)':<25}  {v.commit_sha[:8]}  {v.message_first_line[:50]}"
+        f"{i + 1}. {v.commit_date_utc}  {v.tag or '(sin tag)':<25}  {v.commit_sha[:8]}  {v.message_first_line[:50]}"
         for i, v in enumerate(versions)
     ]
     choice = prompts.ask_choice("Elegí la versión a descargar:", choices=labels)
