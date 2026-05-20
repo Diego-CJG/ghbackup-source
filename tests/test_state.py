@@ -8,7 +8,11 @@ from ghbackup.state.cache import CacheEntry, delete_many, get_all, upsert_many, 
 from ghbackup.state.config import Config, exists, load, reset, save
 from ghbackup.state.deletion_manifest import (
     append_deletions,
+)
+from ghbackup.state.deletion_manifest import (
     load as load_manifest,
+)
+from ghbackup.state.deletion_manifest import (
     save as save_manifest,
 )
 from ghbackup.state.paths import (
