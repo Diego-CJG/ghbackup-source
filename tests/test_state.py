@@ -2,24 +2,16 @@
 
 from __future__ import annotations
 
-import json
-from datetime import datetime, timezone
-from pathlib import Path
-
 import pytest
 
 from ghbackup.state.cache import CacheEntry, delete_many, get_all, upsert_many, wipe
 from ghbackup.state.config import Config, exists, load, reset, save
 from ghbackup.state.deletion_manifest import (
-    DeletionEntry,
-    DeletionManifest,
     append_deletions,
     load as load_manifest,
     save as save_manifest,
 )
 from ghbackup.state.paths import (
-    app_dir,
-    cache_path,
     config_path,
     deletion_manifest_path,
     ensure_dirs,
@@ -27,7 +19,6 @@ from ghbackup.state.paths import (
     operations_jsonl_path,
     operations_md_path,
     recovery_codes_path,
-    vault_path,
 )
 
 
@@ -144,17 +135,17 @@ class TestCache:
 
 
 def _make_config(**kwargs) -> Config:
-    defaults = dict(
-        source_folder="C:/test",
-        repo_owner="user",
-        repo_name="repo",
-        repo_full_name="user/repo",
-        repo_html_url="https://github.com/user/repo",
-        branch="main",
-        github_login="user",
-        created_at_utc="2026-01-01T00:00:00Z",
-        updated_at_utc="2026-01-01T00:00:00Z",
-    )
+    defaults = {
+        "source_folder": "C:/test",
+        "repo_owner": "user",
+        "repo_name": "repo",
+        "repo_full_name": "user/repo",
+        "repo_html_url": "https://github.com/user/repo",
+        "branch": "main",
+        "github_login": "user",
+        "created_at_utc": "2026-01-01T00:00:00Z",
+        "updated_at_utc": "2026-01-01T00:00:00Z",
+    }
     defaults.update(kwargs)
     return Config(**defaults)
 
