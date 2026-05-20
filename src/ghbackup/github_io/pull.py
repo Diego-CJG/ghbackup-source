@@ -1,7 +1,9 @@
 """Operaciones de lectura desde GitHub para los modos de `restore`."""
+
 from __future__ import annotations
 
 import base64
+import contextlib
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -16,7 +18,7 @@ class FileVersion:
     commit_sha: str
     commit_date_utc: str
     message_first_line: str
-    tag: str | None      # tag asociado a ese commit, si existe
+    tag: str | None  # tag asociado a ese commit, si existe
 
 
 def list_versions_of_file(repo: Repository, branch: str, rel_path: str) -> list[FileVersion]:
@@ -29,10 +31,8 @@ def list_versions_of_file(repo: Repository, branch: str, rel_path: str) -> list[
     # mapeo commit_sha → tag
     tag_by_sha: dict[str, str] = {}
     for t in repo.get_tags():
-        try:
+        with contextlib.suppress(GithubException):
             tag_by_sha[t.commit.sha] = t.name
-        except GithubException:
-            pass
 
     versions: list[FileVersion] = []
     for c in commits:
@@ -43,7 +43,9 @@ def list_versions_of_file(repo: Repository, branch: str, rel_path: str) -> list[
         versions.append(
             FileVersion(
                 commit_sha=sha,
-                commit_date_utc=dt.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
+                commit_date_utc=dt.astimezone(timezone.utc)
+                .isoformat(timespec="seconds")
+                .replace("+00:00", "Z"),
                 message_first_line=c.commit.message.splitlines()[0] if c.commit.message else "",
                 tag=tag_by_sha.get(sha),
             )
@@ -56,9 +58,7 @@ def download_file_at_commit(repo: Repository, commit_sha: str, rel_path: str) ->
     try:
         content = repo.get_contents(rel_path, ref=commit_sha)
     except GithubException as exc:
-        raise GitHubError(
-            f"No se pudo descargar {rel_path}@{commit_sha[:7]}: {exc.data}"
-        ) from exc
+        raise GitHubError(f"No se pudo descargar {rel_path}@{commit_sha[:7]}: {exc.data}") from exc
     # PyGithub devuelve un objeto ContentFile con .content base64
     if isinstance(content, list):
         raise GitHubError(f"{rel_path} es un directorio, no un archivo.")

@@ -9,6 +9,7 @@ Guía al usuario paso a paso:
   6. Elegir nombre de rama (default: nombre de la carpeta)
   7. Confirmar y persistir
 """
+
 from __future__ import annotations
 
 import re
@@ -17,14 +18,13 @@ from pathlib import Path
 
 import click
 
-from ghbackup.auth import vault
+from ghbackup.auth import recovery, vault
 from ghbackup.github_io import client as gh_client
 from ghbackup.logging_.dual_logger import log_event
 from ghbackup.state import config as cfg_store
 from ghbackup.state.paths import ensure_dirs
 from ghbackup.ui import prompts
-from ghbackup.ui.colors import error, header, info, success, warn, dim
-
+from ghbackup.ui.colors import dim, error, header, info, success, warn
 
 _INSTRUCTIONS = """\
 Para conectar este ejecutable con tu cuenta de GitHub necesitamos un Personal
@@ -66,13 +66,16 @@ def setup() -> None:
     header("ghbackup — Setup inicial")
     ensure_dirs()
 
-    if cfg_store.exists() and vault.vault_exists():
-        if not prompts.ask_confirm(
+    if (
+        cfg_store.exists()
+        and vault.vault_exists()
+        and not prompts.ask_confirm(
             "Ya existe una configuración previa. ¿Querés sobreescribirla?",
             default=False,
-        ):
-            warn("Setup cancelado.")
-            return
+        )
+    ):
+        warn("Setup cancelado.")
+        return
 
     # --- Paso 1: master password ---
     header("Paso 1/7 — Master password")
@@ -176,10 +179,13 @@ def setup() -> None:
     # --- Paso 6: nombre de rama ---
     header("Paso 6/7 — Nombre de la rama en el repo")
     default_branch_name = _slugify(src.name) or "main-backup"
-    branch = prompts.ask_text(
-        "Nombre de la rama (Enter para usar el sugerido):",
-        default=default_branch_name,
-    ).strip() or default_branch_name
+    branch = (
+        prompts.ask_text(
+            "Nombre de la rama (Enter para usar el sugerido):",
+            default=default_branch_name,
+        ).strip()
+        or default_branch_name
+    )
 
     # --- Paso 7: confirmar y guardar ---
     header("Paso 7/7 — Confirmar y guardar configuración")
@@ -219,8 +225,25 @@ def setup() -> None:
     except Exception as exc:  # noqa: BLE001
         warn(f"Advertencia: no se pudo asegurar el branch ahora: {exc}")
 
+    # Generar recovery codes
+    codes = recovery.generate_codes()
+    recovery.save_codes(codes)
+
+    success("\n✅ Setup completo.")
+    warn("\n" + "=" * 60)
+    warn("  RECOVERY CODES — guardá estos codigos en un lugar seguro")
+    warn("  Cada uno es de uso unico. Sirven si olvidás la master password.")
+    warn("=" * 60)
+    for i, code in enumerate(codes, start=1):
+        info(f"  {i:2d}.  {code}")
+    warn("=" * 60)
+    warn("  Imprimelos o guardalos en tu gestor de contraseñas AHORA.")
+    warn("  No se volvera a mostrar este listado.")
+    warn("=" * 60 + "\n")
+    prompts.ask_confirm("Confirmo que guarde los recovery codes.", default=True)
+
     log_event("setup_complete", branch=branch, extra={"repo": repo.full_name, "login": conn.login})
-    success("\n✅ Setup completo. Ahora podés correr:  ghbackup push")
+    success("Ahora podés correr:  ghbackup push")
 
 
 def _slugify(name: str) -> str:

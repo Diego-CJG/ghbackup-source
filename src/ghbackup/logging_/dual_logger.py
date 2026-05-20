@@ -4,6 +4,7 @@ Para CI/CD se parsea el .jsonl; para revisión humana se abre el .md.
 Ambos archivos son append-only y nunca se rotan automáticamente
 (el usuario puede rotarlos manualmente si crecen demasiado).
 """
+
 from __future__ import annotations
 
 import json
@@ -15,7 +16,6 @@ from ghbackup.state.paths import (
     operations_jsonl_path,
     operations_md_path,
 )
-
 
 _MD_HEADER = (
     "| Fecha (UTC)         | Acción           | Rama       | Tag                    "

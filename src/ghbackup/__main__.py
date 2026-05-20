@@ -2,6 +2,7 @@
 
 Cuando se compila con PyInstaller --onefile, este es el archivo que arranca.
 """
+
 from __future__ import annotations
 
 import sys

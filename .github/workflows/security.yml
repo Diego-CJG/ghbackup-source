@@ -59,7 +59,10 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip-audit --requirement requirements.txt --format json --output pip-audit-report.json || true
-          pip-audit --requirement requirements.txt
+          # PYSEC-2025-183: vulnerabilidad en pyjwt (dep. transitiva de PyGithub).
+          # No hay fix disponible en PyPI al momento. Se ignora hasta que PyGithub
+          # actualice su dependencia o pyjwt publique un release corregido.
+          pip-audit --requirement requirements.txt --ignore-vuln PYSEC-2025-183
 
       - name: Upload pip-audit report
         uses: actions/upload-artifact@v4

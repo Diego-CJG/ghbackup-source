@@ -1,9 +1,9 @@
 """Configuración persistente (sin secretos) en config.json."""
+
 from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
 from typing import Any
 
 from ghbackup.state.paths import config_path, ensure_dirs
@@ -20,9 +20,9 @@ class Config:
     repo_owner: str = ""
     repo_name: str = ""
     branch: str = ""
-    repo_full_name: str = ""           # owner/repo
+    repo_full_name: str = ""  # owner/repo
     repo_html_url: str = ""
-    github_login: str = ""             # último login validado
+    github_login: str = ""  # último login validado
     created_at_utc: str = ""
     updated_at_utc: str = ""
     extra: dict[str, Any] = field(default_factory=dict)

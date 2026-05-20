@@ -1,10 +1,10 @@
 """Filtros de exclusión: defaults hard-coded + .backupignore opcional."""
+
 from __future__ import annotations
 
 from pathlib import Path
 
 import pathspec
-
 
 DEFAULT_PATTERNS = [
     "node_modules/",
@@ -21,7 +21,7 @@ DEFAULT_PATTERNS = [
 ]
 
 
-def build_spec(source_root: Path) -> pathspec.PathSpec:
+def build_spec(source_root: Path) -> pathspec.PathSpec:  # type: ignore[type-arg]
     """Construye un PathSpec combinando defaults + .backupignore del source root."""
     patterns: list[str] = list(DEFAULT_PATTERNS)
     custom = source_root / ".backupignore"
@@ -34,6 +34,6 @@ def build_spec(source_root: Path) -> pathspec.PathSpec:
     return pathspec.PathSpec.from_lines("gitwildmatch", patterns)
 
 
-def is_ignored(relative_path: str, spec: pathspec.PathSpec) -> bool:
+def is_ignored(relative_path: str, spec: pathspec.PathSpec) -> bool:  # type: ignore[type-arg]
     """Devuelve True si la ruta relativa (posix) está cubierta por algún patrón."""
     return spec.match_file(relative_path)

@@ -1,4 +1,5 @@
 """Helpers de impresión con colores (colorama)."""
+
 from __future__ import annotations
 
 from colorama import Fore, Style

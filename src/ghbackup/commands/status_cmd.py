@@ -1,4 +1,5 @@
 """Subcomando `status`: dry-run del push, no sube nada."""
+
 from __future__ import annotations
 
 from pathlib import Path

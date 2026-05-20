@@ -7,12 +7,13 @@ Política (acordada con el usuario):
 - Si el usuario los restaura, marcamos `restored=True`.
 - Pasados los 30 días, no se proponen más automáticamente (pero quedan en el manifiesto).
 """
+
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Iterable
 
 from ghbackup.state.paths import deletion_manifest_path, ensure_dirs
 

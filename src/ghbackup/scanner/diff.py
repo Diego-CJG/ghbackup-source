@@ -7,6 +7,7 @@ Output: un DeltaReport con cinco categorías:
 - deleted:  ruta del cache que ya no existe en disco
 - unchanged: ruta del cache cuyo SHA-256 sigue siendo el mismo
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -26,8 +27,8 @@ class FileChange:
     sha256: str
     size_bytes: int
     mtime_utc: str
-    old_sha256: str | None = None     # solo para modified
-    old_rel_path: str | None = None   # solo para renamed
+    old_sha256: str | None = None  # solo para modified
+    old_rel_path: str | None = None  # solo para renamed
 
 
 @dataclass

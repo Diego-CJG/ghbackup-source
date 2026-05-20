@@ -6,14 +6,16 @@ Politica:
 - El contador se resetea en el primer intento exitoso.
 - Estado persistido en %APPDATA%\\GitHubBackup\\lockout.json.
 """
+
 from __future__ import annotations
 
+import contextlib
 import json
 import time
 from pathlib import Path
+from typing import Any
 
 from ghbackup.state.paths import app_dir
-
 
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
@@ -23,17 +25,17 @@ def _lockout_path() -> Path:
     return app_dir() / "lockout.json"
 
 
-def _load() -> dict:
+def _load() -> dict[str, Any]:
     p = _lockout_path()
     if not p.exists():
         return {"attempts": 0, "locked_until": 0.0}
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
+        return dict(json.loads(p.read_text(encoding="utf-8")))
     except (json.JSONDecodeError, OSError):
         return {"attempts": 0, "locked_until": 0.0}
 
 
-def _save(state: dict) -> None:
+def _save(state: dict[str, Any]) -> None:
     p = _lockout_path()
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(state), encoding="utf-8")
@@ -81,15 +83,13 @@ def record_success() -> None:
     """Resetea el contador tras un intento exitoso."""
     p = _lockout_path()
     if p.exists():
-        try:
+        with contextlib.suppress(OSError):
             p.unlink()
-        except OSError:
-            pass
 
 
 def failed_attempts() -> int:
     """Devuelve el numero de intentos fallidos actuales (sin lockout activo)."""
-    return _load().get("attempts", 0)
+    return int(_load().get("attempts", 0))
 
 
 def remaining_attempts() -> int:
@@ -97,7 +97,7 @@ def remaining_attempts() -> int:
     state = _load()
     if state.get("locked_until", 0.0) > time.time():
         return 0
-    return max(0, MAX_ATTEMPTS - state.get("attempts", 0))
+    return max(0, MAX_ATTEMPTS - int(state.get("attempts", 0)))
 
 
 class LockoutError(Exception):

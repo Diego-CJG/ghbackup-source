@@ -1,5 +1,4 @@
 """Tests unitarios para ghbackup.scanner.walker e ignore."""
-import pytest
 
 from ghbackup.scanner.ignore import build_spec, is_ignored
 from ghbackup.scanner.walker import walk

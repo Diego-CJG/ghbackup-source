@@ -1,29 +1,31 @@
 """Helpers de prompts interactivos (questionary)."""
+
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
+from typing import Any
 
 import questionary
 
 
-def ask_text(message: str, default: str = "", validate=None) -> str:
-    return questionary.text(message, default=default, validate=validate).unsafe_ask()
+def ask_text(message: str, default: str = "", validate: Any = None) -> str:
+    return str(questionary.text(message, default=default, validate=validate).unsafe_ask())
 
 
 def ask_password(message: str) -> str:
-    return questionary.password(message).unsafe_ask()
+    return str(questionary.password(message).unsafe_ask())
 
 
 def ask_confirm(message: str, default: bool = True) -> bool:
-    return questionary.confirm(message, default=default).unsafe_ask()
+    return bool(questionary.confirm(message, default=default).unsafe_ask())
 
 
 def ask_choice(message: str, choices: Iterable[str], default: str | None = None) -> str:
-    return questionary.select(message, choices=list(choices), default=default).unsafe_ask()
+    return str(questionary.select(message, choices=list(choices), default=default).unsafe_ask())
 
 
 def ask_checkbox(message: str, choices: Iterable[str]) -> list[str]:
-    return questionary.checkbox(message, choices=list(choices)).unsafe_ask()
+    return list(questionary.checkbox(message, choices=list(choices)).unsafe_ask())
 
 
 def ask_summary_action() -> str:
@@ -40,4 +42,4 @@ def ask_summary_action() -> str:
             questionary.Choice("[N] Cancelar y no subir nada", value="no"),
         ],
     ).unsafe_ask()
-    return answer
+    return str(answer)

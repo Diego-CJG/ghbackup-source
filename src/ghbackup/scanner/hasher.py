@@ -1,4 +1,5 @@
 """Cálculo de SHA-256 con lectura por chunks (streaming)."""
+
 from __future__ import annotations
 
 import hashlib

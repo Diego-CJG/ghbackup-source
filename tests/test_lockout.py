@@ -1,11 +1,12 @@
 """Tests unitarios para ghbackup.auth.lockout."""
+
+import contextlib
 import time
 
 import pytest
 
 from ghbackup.auth.lockout import (
     MAX_ATTEMPTS,
-    LOCKOUT_SECONDS,
     AttemptsWarning,
     LockoutError,
     check_lockout,
@@ -30,6 +31,7 @@ class TestCheckLockout:
 
     def test_lockout_active_raises(self, tmp_path, monkeypatch):
         import json
+
         lockout_file = tmp_path / "lockout.json"
         state = {"attempts": 0, "locked_until": time.time() + 60.0}
         lockout_file.write_text(json.dumps(state))
@@ -39,6 +41,7 @@ class TestCheckLockout:
 
     def test_expired_lockout_does_not_raise(self, tmp_path, monkeypatch):
         import json
+
         lockout_file = tmp_path / "lockout.json"
         state = {"attempts": 0, "locked_until": time.time() - 1.0}
         lockout_file.write_text(json.dumps(state))
@@ -49,57 +52,45 @@ class TestCheckLockout:
 class TestRecordFailure:
     def test_first_failure_increments_counter(self):
         assert failed_attempts() == 0
-        try:
+        with contextlib.suppress(AttemptsWarning):
             record_failure()
-        except AttemptsWarning:
-            pass
         assert failed_attempts() == 1
 
     def test_failures_accumulate(self):
         for _ in range(2):
-            try:
+            with contextlib.suppress(AttemptsWarning):
                 record_failure()
-            except AttemptsWarning:
-                pass
         assert failed_attempts() == 2
 
     def test_warning_raised_at_two_remaining(self):
         """Al quedar 2 intentos (intento 3 de 5), debe lanzar AttemptsWarning."""
         for _ in range(MAX_ATTEMPTS - 2 - 1):
-            try:
+            with contextlib.suppress(AttemptsWarning):
                 record_failure()
-            except AttemptsWarning:
-                pass
         with pytest.raises(AttemptsWarning, match="2 intento"):
             record_failure()
 
     def test_warning_raised_at_one_remaining(self):
         """Al quedar 1 intento (intento 4 de 5), debe lanzar AttemptsWarning."""
         for _ in range(MAX_ATTEMPTS - 2):
-            try:
+            with contextlib.suppress(AttemptsWarning):
                 record_failure()
-            except AttemptsWarning:
-                pass
         with pytest.raises(AttemptsWarning, match="1 intento"):
             record_failure()
 
     def test_lockout_raised_at_max_attempts(self):
         """Al llegar a 5 intentos, debe lanzar LockoutError."""
         for _ in range(MAX_ATTEMPTS - 1):
-            try:
+            with contextlib.suppress(AttemptsWarning):
                 record_failure()
-            except AttemptsWarning:
-                pass
         with pytest.raises(LockoutError):
             record_failure()
 
     def test_lockout_resets_counter(self):
         """Tras el lockout, el contador de intentos se resetea a 0."""
         for _ in range(MAX_ATTEMPTS - 1):
-            try:
+            with contextlib.suppress(AttemptsWarning):
                 record_failure()
-            except AttemptsWarning:
-                pass
         with pytest.raises(LockoutError):
             record_failure()
         assert failed_attempts() == 0
@@ -107,10 +98,8 @@ class TestRecordFailure:
 
 class TestRecordSuccess:
     def test_success_resets_counter(self):
-        try:
+        with contextlib.suppress(AttemptsWarning):
             record_failure()
-        except AttemptsWarning:
-            pass
         assert failed_attempts() == 1
         record_success()
         assert failed_attempts() == 0
@@ -131,14 +120,13 @@ class TestRemainingAttempts:
         assert remaining_attempts() == MAX_ATTEMPTS
 
     def test_decreases_after_failure(self):
-        try:
+        with contextlib.suppress(AttemptsWarning):
             record_failure()
-        except AttemptsWarning:
-            pass
         assert remaining_attempts() == MAX_ATTEMPTS - 1
 
     def test_zero_when_locked(self, tmp_path, monkeypatch):
         import json
+
         lockout_file = tmp_path / "lockout.json"
         state = {"attempts": 0, "locked_until": time.time() + 60.0}
         lockout_file.write_text(json.dumps(state))
@@ -146,9 +134,7 @@ class TestRemainingAttempts:
         assert remaining_attempts() == 0
 
     def test_resets_to_max_after_success(self):
-        try:
+        with contextlib.suppress(AttemptsWarning):
             record_failure()
-        except AttemptsWarning:
-            pass
         record_success()
         assert remaining_attempts() == MAX_ATTEMPTS
