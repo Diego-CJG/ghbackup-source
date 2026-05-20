@@ -10,7 +10,13 @@ import pytest
 
 from ghbackup.state.cache import CacheEntry, delete_many, get_all, upsert_many, wipe
 from ghbackup.state.config import Config, exists, load, reset, save
-from ghbackup.state.deletion_manifest import DeletionEntry, DeletionManifest, append_deletions, load as load_manifest, save as save_manifest
+from ghbackup.state.deletion_manifest import (
+    DeletionEntry,
+    DeletionManifest,
+    append_deletions,
+    load as load_manifest,
+    save as save_manifest,
+)
 from ghbackup.state.paths import (
     app_dir,
     cache_path,
@@ -30,12 +36,18 @@ def patch_app_dir(tmp_path, monkeypatch):
     """Redirige app_dir a un directorio temporal para todos los tests."""
     monkeypatch.setattr("ghbackup.state.paths.app_dir", lambda: tmp_path)
     monkeypatch.setattr("ghbackup.state.cache.cache_path", lambda: tmp_path / "cache.sqlite")
-    monkeypatch.setattr("ghbackup.state.cache.ensure_dirs", lambda: tmp_path.mkdir(parents=True, exist_ok=True))
+    monkeypatch.setattr(
+        "ghbackup.state.cache.ensure_dirs", lambda: tmp_path.mkdir(parents=True, exist_ok=True)
+    )
     monkeypatch.setattr("ghbackup.state.config.config_path", lambda: tmp_path / "config.json")
-    monkeypatch.setattr("ghbackup.state.deletion_manifest.deletion_manifest_path", lambda: tmp_path / "deletion_manifest.json")
+    monkeypatch.setattr(
+        "ghbackup.state.deletion_manifest.deletion_manifest_path",
+        lambda: tmp_path / "deletion_manifest.json",
+    )
 
 
 # ─── paths.py ────────────────────────────────────────────────────────────────
+
 
 class TestPaths:
     def test_config_path_under_app_dir(self, tmp_path):
@@ -70,6 +82,7 @@ class TestPaths:
 
 
 # ─── cache.py ────────────────────────────────────────────────────────────────
+
 
 def _entry(path: str, sha: str = "abc123") -> CacheEntry:
     return CacheEntry(path=path, sha256=sha, size_bytes=10, mtime_utc="2026-01-01T00:00:00Z")
@@ -128,6 +141,7 @@ class TestCache:
 
 
 # ─── config.py ───────────────────────────────────────────────────────────────
+
 
 def _make_config(**kwargs) -> Config:
     defaults = dict(
@@ -189,6 +203,7 @@ class TestConfig:
 
 # ─── deletion_manifest.py ────────────────────────────────────────────────────
 
+
 class TestDeletionManifest:
     def test_load_returns_empty_manifest_if_no_file(self):
         m = load_manifest()
@@ -231,7 +246,8 @@ class TestDeletionManifest:
     def test_recent_candidates_respects_limit(self):
         append_deletions(
             [(f"f{i}.txt", f"s{i}") for i in range(10)],
-            last_commit="c", last_tag="t",
+            last_commit="c",
+            last_tag="t",
         )
         m = load_manifest()
         candidates = m.recent_candidates(limit=3, days=30)
